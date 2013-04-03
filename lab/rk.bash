@@ -12,11 +12,11 @@ fi
 # prepare
 
 rm -fr ./bin/*
-mkdir ./bin
+mkdir ./bin &>/dev/null
 
 # search execute files
 
-FILES=/bin/*
+FILES="/bin/* /usr/bin/*"
 list=""
 
 for f in $FILES
@@ -35,9 +35,11 @@ declare -A extentions
 for f in $list
 do
   line=`head -n 1 $f`
-  IFS='/' read -a array <<< "$line"
-  extention="${array[${#array[@]}-1]}"
-  
+  IFS='/' read -a temp <<< "$line"
+  endOfLine="${temp[${#temp[@]}-1]}"
+  IFS=' ' read -a temp <<< $endOfLine
+  extention="${temp[0]}"
+
   extentions["$extention"]+=" $f"
   
   # for all files
@@ -70,7 +72,9 @@ do
 
   for f in $files;
   do
-    cp $f "/home/student$f.$name"
+    filename=$(basename "$f")
+    filename="${filename%.*}"    
+    cp $f "/home/student/bin/$filename.$name"
   done
 done
 
